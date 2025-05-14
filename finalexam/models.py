@@ -23,12 +23,12 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     stock = models.PositiveIntegerField()
     created_at = models.DateTimeField(default=timezone.now)
-    updated_at = models.DateTimeField(auto_now=True)  # Qo'shilgan maydon
-    slug = models.SlugField(unique=True, blank=True, null=True)  # Slug maydoni qo'shildi
+    updated_at = models.DateTimeField(auto_now=True) 
+    slug = models.SlugField(unique=True, blank=True, null=True)  
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.name)  # Slugni avtomatik yaratish
+            self.slug = slugify(self.name) 
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -54,8 +54,8 @@ class Comment(models.Model):
     pros = models.TextField()
     cons = models.TextField()
     review = models.TextField()
-    created_at = models.DateTimeField(default=timezone.now)  # Yaratilish vaqti qo'shildi
-
+    created_at = models.DateTimeField(default=timezone.now) 
+    
     def __str__(self):
         return f"Comment by {self.user.username} on {self.product.name}"
 

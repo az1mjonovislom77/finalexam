@@ -1,4 +1,5 @@
 from rest_framework import generics, status
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from .models import Category, Product, Like, Comment, Cart, CartItem, Order, OrderItem
@@ -7,7 +8,7 @@ from .serializers import (
     CartSerializer, CartItemSerializer, OrderSerializer
 )
 
-# --- Category Views ---
+
 class CategoryCreateView(generics.CreateAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
@@ -16,8 +17,6 @@ class CategoryDeleteView(generics.DestroyAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
-
-# --- Product Views ---
 class ProductCreateView(generics.CreateAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
@@ -25,10 +24,6 @@ class ProductCreateView(generics.CreateAPIView):
 class ProductDeleteView(generics.DestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
-
-
-# --- Like Toggle View (custom logic, not generic) ---
-from rest_framework.views import APIView
 
 class LikeToggleView(APIView):
 
@@ -42,7 +37,6 @@ class LikeToggleView(APIView):
         return Response({'liked': True})
 
 
-# --- Comment Create ---
 class CommentCreateView(generics.CreateAPIView):
     serializer_class = CommentSerializer
 
@@ -51,8 +45,6 @@ class CommentCreateView(generics.CreateAPIView):
         product = get_object_or_404(Product, pk=product_id)
         serializer.save(user=self.request.user, product=product)
 
-
-# --- CartItem Add View (custom logic) ---
 class CartItemAddView(APIView):
 
     def post(self, request):
@@ -64,8 +56,6 @@ class CartItemAddView(APIView):
         item.save()
         return Response({'status': 'added'})
 
-
-# --- Order Create View ---
 class OrderCreateView(APIView):
 
     def post(self, request):
