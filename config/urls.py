@@ -18,20 +18,28 @@ from django.contrib import admin
 from django.urls import path, include
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
+from rest_framework import permissions
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 
 schema_view = get_schema_view(
-    openapi.Info(
-        title="Your Project API",
-        default_version='v1',
-        description="API documentation for your project",
-        contact=openapi.Contact(email="azimjonovislomjon77@gmail.com"),
-    ),
-    public=True,
+   openapi.Info(
+      title="API",
+      default_version='v1',
+      description="API documentation",
+   ),
+   public=True,
+   permission_classes=(permissions.AllowAny,),
 )
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('users/', include('users.urls')),
     path('api/', include('finalexam.urls')),
-    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='swagger-ui'), 
+    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='swagger-ui'),
+    path('users/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('users/token-refresh/', TokenRefreshView.as_view(), name='token_refresh'), 
 
 ]

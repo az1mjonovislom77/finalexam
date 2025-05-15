@@ -1,65 +1,73 @@
 from rest_framework import serializers
-from .models import (
-    Category, Product, Like, Comment,
-    Cart, CartItem, Order, OrderItem
-)
+from .models import User, Category, Product, Like, Comment, Cart, CartItem, Order, OrderItem
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email']
+
+class RegisterSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password']
+
+    def create(self, validated_data):
+        user = User.objects.create_user(
+            username=validated_data['username'],
+            email=validated_data.get('email'),
+            password=validated_data['password']
+        )
+        return user
 
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ['id', 'name', 'slug']
+        fields = '__all__'
 
 
 class ProductSerializer(serializers.ModelSerializer):
-    category = CategorySerializer(read_only=True)
-    category_slug = serializers.PrimaryKeyRelatedField(
-        queryset=Category.objects.all(), source='category', write_only=True
-    )
-
+    user = UserSerializer(read_only=True)  
     class Meta:
         model = Product
-        fields = ['id', 'name', 'description', 'price', 'category', 'category_slug']
+        fields = '__all__'
+        read_only_fields = ['user'] 
 
+
+class LikeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Like
+        fields = '__all__'
 
 class CommentSerializer(serializers.ModelSerializer):
-    user = serializers.StringRelatedField(read_only=True)
+    user = UserSerializer(read_only=True)
 
     class Meta:
         model = Comment
-        fields = ['id', 'user', 'product', 'created_at']
-
-
-class CartItemSerializer(serializers.ModelSerializer):
-    product = ProductSerializer(read_only=True)
-    product_id = serializers.PrimaryKeyRelatedField(
-        queryset=Product.objects.all(), source='product', write_only=True
-    )
-
-    class Meta:
-        model = CartItem
-        fields = ['id', 'product', 'product_id', 'quantity']
+        fields = '__all__'
+        read_only_fields = ['user', 'product']
 
 
 class CartSerializer(serializers.ModelSerializer):
-    items = CartItemSerializer(many=True, read_only=True)
-
     class Meta:
         model = Cart
-        fields = ['id', 'user', 'items']
+        fields = '__all__'
 
+class CartItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CartItem
+        fields = '__all__'
 
 class OrderItemSerializer(serializers.ModelSerializer):
-    product = ProductSerializer(read_only=True)
-
     class Meta:
         model = OrderItem
-        fields = ['id', 'product', 'quantity']
-
+        fields = '__all__'
 
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, read_only=True)
 
     class Meta:
         model = Order
-        fields = ['id', 'user', 'created_at', 'items']
+        fields = '__all__'
